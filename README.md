@@ -52,6 +52,33 @@ To opt in to auto-updates (recommended), so you always get the latest version:
 /plugin → Marketplaces → marimo-pair → Enable auto-update
 ```
 
+### Nix flake
+
+For Nix users, the repo also exposes a flake with the skill as a package.
+Reference it as an input and drop it into a Claude skills directory.
+
+```nix
+{
+  inputs.marimo-pair.url = "github:marimo-team/marimo-pair";
+
+  # Home Manager example
+  outputs = { self, nixpkgs, home-manager, marimo-pair, ... }: {
+    homeConfigurations."you" = home-manager.lib.homeManagerConfiguration {
+      modules = [{
+        home.file.".claude/skills/marimo-pair".source =
+          marimo-pair.packages.${pkgs.system}.default;
+      }];
+    };
+  };
+}
+```
+
+A devShell with `nu` and `curl` on `PATH` is also provided:
+
+```
+nix develop github:marimo-team/marimo-pair
+```
+
 ## FAQ
 
 ### I keep getting prompted to allow Bash commands
