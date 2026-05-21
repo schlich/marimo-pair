@@ -15,8 +15,7 @@
 
 - A running [marimo](https://marimo.io) notebook (`--no-token` for
   auto-discovery; `MARIMO_TOKEN` env var for servers with auth)
-- `bash`, `curl`, and `jq` available on `PATH` (on Windows, run from
-  Git Bash)
+- [`nu`](https://www.nushell.sh) (Nushell) and `curl` available on `PATH`
 
 ## Install
 
@@ -66,8 +65,9 @@ paths to the scripts from the installed skill and add them to your
 {
   "permissions": {
     "allow": [
-      "Bash(bash /path/to/skills/marimo-pair/scripts/discover-servers.sh *)",
-      "Bash(bash /path/to/skills/marimo-pair/scripts/execute-code.sh *)"
+      "Bash(nu /path/to/skills/marimo-pair/scripts/discover-servers.nu *)",
+      "Bash(nu /path/to/skills/marimo-pair/scripts/execute-code.nu *)",
+      "Bash(nu --stdin /path/to/skills/marimo-pair/scripts/execute-code.nu *)"
     ]
   }
 }

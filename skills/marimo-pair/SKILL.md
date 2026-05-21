@@ -4,7 +4,7 @@ description: >-
   Work inside a running marimo notebook's kernel — execute code, create cells,
   and build a notebook as an artifact. Use when the user wants to start a
   marimo notebook or work in an active marimo session.
-allowed-tools: Bash(bash **/scripts/discover-servers.sh *), Bash(bash **/scripts/execute-code.sh *), Read
+allowed-tools: Bash(nu **/scripts/discover-servers.nu *), Bash(nu **/scripts/execute-code.nu *), Bash(nu --stdin **/scripts/execute-code.nu *), Read
 ---
 
 # marimo Pair Programming Protocol
@@ -50,9 +50,9 @@ in their browser (`open` on macOS, `xdg-open` on Linux, `start` on Windows).
 
 ## Troubleshooting
 
-### `SyntaxError` or `ImportError` from `execute-code.sh`
+### `SyntaxError` or `ImportError` from `execute-code.nu`
 
-Code runs **inside the running marimo kernel** — `execute-code.sh` POSTs it
+Code runs **inside the running marimo kernel** — `execute-code.nu` POSTs it
 over HTTP and never invokes a local Python. So errors here are not caused by
 the local Python version, missing venv, or `uv` vs `pip` — they're problems
 with the code being sent. Fix the code (use a heredoc for anything
@@ -69,8 +69,9 @@ paths to the scripts to their `.claude/settings.json` (project-level) or
 {
   "permissions": {
     "allow": [
-      "Bash(bash /absolute/path/to/skills/marimo-pair/scripts/discover-servers.sh *)",
-      "Bash(bash /absolute/path/to/skills/marimo-pair/scripts/execute-code.sh *)"
+      "Bash(nu /absolute/path/to/skills/marimo-pair/scripts/discover-servers.nu *)",
+      "Bash(nu /absolute/path/to/skills/marimo-pair/scripts/execute-code.nu *)",
+      "Bash(nu --stdin /absolute/path/to/skills/marimo-pair/scripts/execute-code.nu *)"
     ]
   }
 }
@@ -82,10 +83,10 @@ Two operations: **discover servers** and **execute code**.
 
 | Operation | Script | MCP |
 |-----------|--------|-----|
-| Discover servers | `bash scripts/discover-servers.sh` | `list_sessions()` tool |
-| Execute code | `bash scripts/execute-code.sh -c "code"` | `execute_code(code=..., session_id=...)` tool |
-| Execute code (multiline) | `bash scripts/execute-code.sh <<'EOF'` | same |
-| Execute code (by URL) | `bash scripts/execute-code.sh --url http://localhost:2718 -c "code"` | same (with `url` param) |
+| Discover servers | `nu scripts/discover-servers.nu` | `list_sessions()` tool |
+| Execute code | `nu scripts/execute-code.nu -c "code"` | `execute_code(code=..., session_id=...)` tool |
+| Execute code (multiline) | `nu --stdin scripts/execute-code.nu <<'EOF'` | same |
+| Execute code (by URL) | `nu scripts/execute-code.nu --url http://localhost:2718 -c "code"` | same (with `url` param) |
 
 Scripts auto-discover sessions from the local server registry. Use
 `--port` to target a specific server when multiple are running,
@@ -127,8 +128,9 @@ pick something reasonable.
 multiline code or code with quotes/backticks/`${}`, use a heredoc or a file:
 
 ```bash
-# heredoc (single-quoted delimiter prevents shell interpolation)
-bash scripts/execute-code.sh <<'EOF'
+# heredoc (single-quoted delimiter prevents shell interpolation; --stdin
+# tells nu to pipe stdin into the script's $in)
+nu --stdin scripts/execute-code.nu <<'EOF'
 import marimo._code_mode as cm
 
 async with cm.get_context() as ctx:
@@ -136,10 +138,10 @@ async with cm.get_context() as ctx:
 EOF
 
 # file
-bash scripts/execute-code.sh /tmp/code.py
+nu scripts/execute-code.nu /tmp/code.py
 
 # target a specific port (skips auto-selection when multiple servers run)
-bash scripts/execute-code.sh --port 2718 -c "1 + 1"
+nu scripts/execute-code.nu --port 2718 -c "1 + 1"
 ```
 
 ## Executing Code
